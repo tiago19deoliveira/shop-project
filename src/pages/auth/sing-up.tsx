@@ -1,6 +1,8 @@
+import { registerRestaurante } from "@/api/register-shop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMutation } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,15 +28,22 @@ export function SignUp() {
     formState: { isSubmitting },
   } = useForm<SignUpForm>();
 
+  const {mutateAsync: postRestaurants} =useMutation({
+    mutationFn: registerRestaurante
+  })
+
   async function handleSignUp(data: SignUpForm) {
     try {
-      console.log(data, "Estabelecimento cadastrado ");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      await registerRestaurante({
+        restaurantName: data.name,
+        phone: data.phone,
+        manager:data.managerName,
+        email: data.email
+      })
       toast.success("Enviando contrato de login ", {
         action: {
           label: "Login",
-          onClick: () => navigate("/sign-in"),
+      onClick: () => navigate(`/sign-in?email=${data.email}`),
         },
       });
     } catch (error) {
