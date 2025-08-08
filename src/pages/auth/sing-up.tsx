@@ -1,4 +1,4 @@
-import { registerRestaurante } from "@/api/register-shop";
+import { registerRestaurant, type RegisterRestauranteBody } from "@/api/register-shop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,13 +28,13 @@ export function SignUp() {
     formState: { isSubmitting },
   } = useForm<SignUpForm>();
 
-  const {mutateAsync: postRestaurants} =useMutation({
-    mutationFn: registerRestaurante
-  })
+  const { mutateAsync: registerRestaurantFn } = useMutation({
+  mutationFn: (data: RegisterRestauranteBody) => registerRestaurant(data),
+});
 
   async function handleSignUp(data: SignUpForm) {
     try {
-      await registerRestaurante({
+      await registerRestaurantFn({
         restaurantName: data.name,
         phone: data.phone,
         manager:data.managerName,

@@ -7,7 +7,7 @@ export interface RegisterRestauranteBody {
   phone: string;
 }
 
-export async function registerRestaurante({
+export async function registerRestaurant({
 restaurantName,
   email,
   manager,
