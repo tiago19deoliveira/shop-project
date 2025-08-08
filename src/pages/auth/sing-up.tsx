@@ -37,7 +37,7 @@ export function SignUp() {
       await registerRestaurantFn({
         restaurantName: data.name,
         phone: data.phone,
-        manager:data.managerName,
+        managerName:data.managerName,
         email: data.email
       })
       toast.success("Enviando contrato de login ", {
