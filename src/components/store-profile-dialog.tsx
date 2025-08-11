@@ -1,4 +1,5 @@
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -8,33 +9,71 @@ import { Button } from "./ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { useQuery } from "@tanstack/react-query";
-import { getManageRestaurant } from "@/api/get-managed-shop";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getManageRestaurant, type GetManageRestaurantResponse } from "@/api/get-managed-shop";
 import { useForm } from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { updatedProfile } from "@/api/update-profile";
+import { toast } from "sonner";
+
 
 const profilePageRestaurant = z.object({
   name: z.string().min(1),
-  description: z.string().min(1)
-})
+  description: z.string().min(1),
+});
 
- type ProfilePagesRestaurantSchema = z.infer< typeof profilePageRestaurant>
+type ProfilePagesRestaurantSchema = z.infer<typeof profilePageRestaurant>;
 
 export function StoreProfileDialog() {
+  const queryClient = useQueryClient();
+
   const { data: managedRestaurante } = useQuery({
     queryFn: getManageRestaurant,
     queryKey: ["managed-restaurant"],
+    staleTime: Infinity
   });
   console.log(managedRestaurante);
 
-  const { register, handleSubmit } = useForm<ProfilePagesRestaurantSchema>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<ProfilePagesRestaurantSchema>({
     resolver: zodResolver(profilePageRestaurant),
     values: {
       name: managedRestaurante?.name ?? "",
       description: managedRestaurante?.description ?? "",
     },
   });
+
+  const { mutateAsync: updatedProfileFn } = useMutation({
+    mutationFn: updatedProfile,
+    onSuccess(_, {name, description}){
+      const cached = queryClient.getQueryData<GetManageRestaurantResponse>(['managed-restaurant'])
+       if(cached){
+        queryClient.setQueryData<GetManageRestaurantResponse>(['managed-restaurant'], {
+          ...cached,
+          name,
+          description
+        })
+       }
+    }
+  });
+
+  async function handleUpdateProfile(data: ProfilePagesRestaurantSchema) {
+    try {
+      await updatedProfileFn({
+        name: data.name,
+        description: data.description,
+      });
+      toast.success("Perfil atualizado !");
+    } catch (error) {
+      toast.error("Houve um Problema ao atualizar o perfil !");
+      console.log("Erro ao atualizar", error);
+    }
+  }
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -45,9 +84,9 @@ export function StoreProfileDialog() {
         </DialogDescription>
       </DialogHeader>
 
-      <form>
+      <form onSubmit={handleSubmit(handleUpdateProfile)}>
         <div className="space-y-4 py-4">
-          <div className="grid-cols-4 grid items-center gap-4">
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="name">
               Nome
             </Label>
@@ -67,10 +106,12 @@ export function StoreProfileDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="ghost">
-            Cancelar
-          </Button>
-          <Button type="submit" variant="success">
+          <DialogClose asChild>
+            <Button type="button" variant="ghost">
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button type="submit" variant="success" disabled={isSubmitting}>
             Salvar
           </Button>
         </DialogFooter>

@@ -21,11 +21,13 @@ export function AccountMenu() {
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryFn: getProfile,
     queryKey: ["profile"],
+    staleTime: Infinity
   });
   const { data: managedRestaurante, isLoading: isLoadingManagedRestaurant } =
     useQuery({
       queryFn: getManageRestaurant,
       queryKey: ["managed-restaurant"],
+      staleTime: Infinity
     });
 
   return (
@@ -71,8 +73,8 @@ export function AccountMenu() {
             <span>Sair</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
+        <StoreProfileDialog/>
       </DropdownMenu>
-      <StoreProfileDialog/>
 
       </Dialog>
     </div>
