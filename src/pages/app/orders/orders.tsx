@@ -2,6 +2,7 @@ import { getOrders } from "@/api/get-orders";
 import { OrderTableFilters } from "@/components/order-table-filters";
 import { OrderTableRow } from "@/components/order-table-row";
 import { Pagination } from "@/components/pagination";
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -9,14 +10,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
-
+import { useSearchParams } from "react-router-dom";
+import z from "zod";
 
 export function Orders() {
-  const {data: result} = useQuery({
-    queryKey: ['orders'],
-    queryFn: getOrders
-  })
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageIndex = z.coerce
+    .number()
+    .transform((page) => page - 1)
+    .parse(searchParams.get("page") ?? "1");
+
+  const { data: result } = useQuery({
+    queryKey: ["orders", pageIndex],
+    queryFn: () => getOrders({ pageIndex }),
+  });
+
+  function handlePagination(pageIndex:number){
+    setSearchParams((url) => {
+      url.set('page', (pageIndex + 1).toString())
+      return url 
+    })
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,18 +55,23 @@ export function Orders() {
             </TableHeader>
             <TableBody>
               {/* Lógica js de renderização com base no tamanho da tabela, utilizando o index e repassando ele ao componente OrderTableRow como prop de ref*/}
-              
-              {
-                result && result.orders.map((order) =>{
-                  return <OrderTableRow key={order.orderId} order={order}/>
-                })
-              }
+
+              {result &&
+                result.orders.map((order) => {
+                  return <OrderTableRow key={order.orderId} order={order} />;
+                })}
             </TableBody>
           </Table>
         </div>
-        <Pagination pageIndex={0} totalCount={105} perPage={10} />
+        {result && (
+          <Pagination
+            pageIndex={pageIndex}
+            totalCount={result.meta.totalCount}
+            perPage={result.meta.perPage}
+            onPageChange={handlePagination}
+          />
+        )}
       </div>
     </div>
   );
 }
- 

@@ -5,12 +5,14 @@ export interface PaginationProps {
   pageIndex: number; //index da página
   totalCount: number; //total de itens
   perPage: number; // quantos itens vem na página
+  onPageChange :(pageIndex:number) => Promise<void> | void
 }
 // destructing de propriedades
 export function Pagination({
   pageIndex,
   totalCount,
   perPage,
+  onPageChange,
 }: PaginationProps) {
   // formatação para contagem de páginas
   const pages = Math.ceil(totalCount / perPage) || 1;
@@ -25,19 +27,30 @@ export function Pagination({
           Pagina {pageIndex + 1} de {pages}
         </div>
         <div className="ga-2 flex items-center">
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button 
+          onClick={()=>
+          onPageChange(0)}
+          variant="outline"
+          className="h-8 w-8 p-0"
+          disabled={pageIndex === 0}
+          >
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Primeira Página</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button onClick={()=> onPageChange(pageIndex - 1)} variant="outline" className="h-8 w-8 p-0" disabled={pageIndex === 0}>
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Página Anterior</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button onClick={()=> onPageChange(pageIndex + 1)} variant="outline" className="h-8 w-8 p-0" disabled={pages <= pageIndex + 1}>
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Próxima Página</span>
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0">
+          <Button 
+          onClick={()=> onPageChange(pages + 1)}  
+          variant="outline" 
+          className="h-8 w-8 p-0"
+          disabled={pages <= pageIndex + 1}
+          >
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Última Página</span>
           </Button>
