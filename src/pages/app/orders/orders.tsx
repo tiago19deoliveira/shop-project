@@ -16,9 +16,9 @@ import z from "zod";
 export function Orders() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const orderId = searchParams.get('orderId');
-  const customerName = searchParams.get('customerName')
-  const status = searchParams.get('status')
+  const orderId = searchParams.get("orderId");
+  const customerName = searchParams.get("customerName")
+  const status = searchParams.get("status")
 
   const pageIndex = z.coerce
     .number()
@@ -27,8 +27,8 @@ export function Orders() {
 
    // toda alteração que vai alterar algum tipo de valor deve estar na query KEy (anotação0)
   const { data: result } = useQuery({
-    queryKey: ["orders", pageIndex],
-    queryFn: () => getOrders({ pageIndex, orderId, customerName, status : status === 'all' ? null : status}),
+    queryKey: ["orders", pageIndex, orderId, customerName, status],
+    queryFn: () => getOrders({ pageIndex, orderId, customerName, status : status == 'all' ? null : status}),
   });
 
   function handlePagination(pageIndex:number){
