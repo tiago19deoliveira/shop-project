@@ -14,7 +14,7 @@ export interface GetOrderDetailsResponse {
         email:String
         phone:string | null
     }
-    orderItem:{
+    orderItems:{
         id: string
         priceInCents:number
         quantity:number

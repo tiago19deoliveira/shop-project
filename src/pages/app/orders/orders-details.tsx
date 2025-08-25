@@ -1,7 +1,8 @@
 import { getOrderDetails } from "@/api/get-order-details";
 import { OrderStatus } from "@/components/order-status";
-import { DialogHeader } from "@/components/ui/dialog";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
+  Table,
   TableBody,
   TableCell,
   TableFooter,
@@ -9,15 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@radix-ui/react-dialog";
+
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Table } from "lucide-react";
+
 
 export interface OrdersDetailsProps {
   orderId: string;
@@ -27,14 +24,10 @@ export interface OrdersDetailsProps {
 export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
   //com o enabled, utilizando o estado via prop do componente pai, a query só será feita quando open for 'true'
   const { data: order } = useQuery({
-    queryKey: ["order", orderId],
+    queryKey: ['order', orderId],
     queryFn: () => getOrderDetails({ orderId }),
     enabled: open,
   });
-
-  if (!order) {
-    return null;
-  }
 
   return (
     <div>
@@ -43,7 +36,7 @@ export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
           <DialogTitle>Pedido: {orderId}</DialogTitle>
           <DialogDescription>Detalhes do pedido:</DialogDescription>
         </DialogHeader>
-        (order && (
+        {order && (
         <div className="space-y-6">
           <Table>
             <TableRow>
@@ -93,7 +86,7 @@ export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {order.orderItem.map((item) => {
+              {order.orderItems.map((item) => {
                 return (
                   <TableRow key={item.id}>
                     <TableCell>{item.product.name}</TableCell>
@@ -130,7 +123,7 @@ export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
             </TableFooter>
           </Table>
         </div>
-        ))
+        )}
       </DialogContent>
     </div>
   );
