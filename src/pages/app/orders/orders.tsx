@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { useSearchParams } from "react-router-dom";
 import z from "zod";
+import { OrderTableSkeleton } from "./order-table-skeleton";
 
 export function Orders() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,7 +27,7 @@ export function Orders() {
     .parse(searchParams.get("page") ?? "1");
 
    // toda alteração que vai alterar algum tipo de valor deve estar na query KEy (anotação0)
-  const { data: result } = useQuery({
+  const { data: result, isLoading: isLoadingOrders } = useQuery({
     queryKey: ["orders", pageIndex, orderId, customerName, status],
     queryFn: () => getOrders({ pageIndex, orderId, customerName, status : status == 'all' ? null : status}),
   });
@@ -60,7 +61,7 @@ export function Orders() {
             </TableHeader>
             <TableBody>
               {/* Lógica js de renderização com base no tamanho da tabela, utilizando o index e repassando ele ao componente OrderTableRow como prop de ref*/}
-
+              {isLoadingOrders && <OrderTableSkeleton/>}
               {result &&
                 result.orders.map((order) => {
                   return <OrderTableRow key={order.orderId} order={order} />;
