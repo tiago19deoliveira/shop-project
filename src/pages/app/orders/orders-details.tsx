@@ -14,6 +14,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { OrdersDetailsSkeleton } from "./orders-details-skeleton";
 
 
 export interface OrdersDetailsProps {
@@ -23,7 +24,7 @@ export interface OrdersDetailsProps {
 
 export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
   //com o enabled, utilizando o estado via prop do componente pai, a query só será feita quando open for 'true'
-  const { data: order } = useQuery({
+  const { data: order, isLoading: isLoadingOrderDetails} = useQuery({
     queryKey: ['order', orderId],
     queryFn: () => getOrderDetails({ orderId }),
     enabled: open,
@@ -36,7 +37,7 @@ export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
           <DialogTitle>Pedido: {orderId}</DialogTitle>
           <DialogDescription>Detalhes do pedido:</DialogDescription>
         </DialogHeader>
-        {order && (
+        {order ? (
         <div className="space-y-6">
           <Table>
             <TableRow>
@@ -123,6 +124,8 @@ export function OrdersDetails({ orderId, open }: OrdersDetailsProps) {
             </TableFooter>
           </Table>
         </div>
+        ):(
+          <OrdersDetailsSkeleton/>
         )}
       </DialogContent>
     </div>
