@@ -8,7 +8,7 @@ export interface PaginationProps {
   onPageChange :(pageIndex:number) => Promise<void> | void
 }
 // destructing de propriedades
-export function Pagination({
+export default function Pagination({
   pageIndex,
   totalCount,
   perPage,
@@ -19,12 +19,11 @@ export function Pagination({
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-muted-foreground">
-        total de {totalCount} item(s)
+        {`Total de ${totalCount} item(s)`}
       </span>
       <div className="flex items-center gap-6 lg:gap-6">
         <div className="text-sm font-medium">
-          {" "}
-          Pagina {pageIndex + 1} de {pages}
+           {`Página ${pageIndex + 1} de ${pages}`}
         </div>
         <div className="ga-2 flex items-center">
           <Button 
