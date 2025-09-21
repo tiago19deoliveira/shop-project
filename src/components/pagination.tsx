@@ -45,7 +45,7 @@ export default function Pagination({
             <span className="sr-only">Próxima Página</span>
           </Button>
           <Button 
-          onClick={()=> onPageChange(pages + 1)}  
+          onClick={()=> onPageChange(pages - 1)}  
           variant="outline" 
           className="h-8 w-8 p-0"
           disabled={pages <= pageIndex + 1}
